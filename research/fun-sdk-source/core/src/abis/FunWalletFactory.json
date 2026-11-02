@@ -1,0 +1,232 @@
+{
+  "name": "FunWalletFactory",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contractICreate3Deployer",
+          "name": "_deployer",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_funWalletImpAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "addresspayable",
+          "name": "_feeOracle",
+          "type": "address"
+        },
+        {
+          "internalType": "contractIWalletInit",
+          "name": "_walletInit",
+          "type": "address"
+        },
+        {
+          "internalType": "contractIEntryPoint",
+          "name": "_entryPoint",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "funWallet",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes",
+          "name": "initializerCallData",
+          "type": "bytes"
+        }
+      ],
+      "name": "AccountCreated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "feeOracle",
+          "type": "address"
+        }
+      ],
+      "name": "FeeOracleSet",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "unstakeDelaySec",
+          "type": "uint32"
+        }
+      ],
+      "name": "addStakeToEntryPoint",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "initializerCallData",
+          "type": "bytes"
+        },
+        { "internalType": "bytes", "name": "data", "type": "bytes" }
+      ],
+      "name": "createAccount",
+      "outputs": [
+        {
+          "internalType": "contractIFunWallet",
+          "name": "funWallet",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "deployer",
+      "outputs": [
+        {
+          "internalType": "contractICreate3Deployer",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "entryPoint",
+      "outputs": [
+        { "internalType": "contractIEntryPoint", "name": "", "type": "address" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "feeOracle",
+      "outputs": [
+        { "internalType": "addresspayable", "name": "", "type": "address" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "funWalletImplementation",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "bytes", "name": "data", "type": "bytes" }],
+      "name": "getAddress",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getFeeOracle",
+      "outputs": [
+        { "internalType": "addresspayable", "name": "", "type": "address" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "moduleId",
+      "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "addresspayable",
+          "name": "_feeOracle",
+          "type": "address"
+        }
+      ],
+      "name": "setFeeOracle",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "unlockStakeFromEntryPoint",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "bytes32", "name": "salt", "type": "bytes32" },
+        { "internalType": "address", "name": "sender", "type": "address" }
+      ],
+      "name": "verifyDeployedFrom",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "walletInit",
+      "outputs": [
+        { "internalType": "contractIWalletInit", "name": "", "type": "address" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "addresspayable",
+          "name": "withdrawAddress",
+          "type": "address"
+        }
+      ],
+      "name": "withdrawStakeFromEntryPoint",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "addresses": {
+    "1": "0xBADa4B9bdc249B788A6247e4a8a9158eD0b3e504",
+    "5": "0xBADa4B9bdc249B788A6247e4a8a9158eD0b3e504",
+    "10": "0xBADa4B9bdc249B788A6247e4a8a9158eD0b3e504",
+    "137": "0xBADa4B9bdc249B788A6247e4a8a9158eD0b3e504",
+    "8453": "0xBADa4B9bdc249B788A6247e4a8a9158eD0b3e504",
+    "36865": "0xBADa4B9bdc249B788A6247e4a8a9158eD0b3e504",
+    "42161": "0xBADa4B9bdc249B788A6247e4a8a9158eD0b3e504",
+    "421614": "0x177D6C1Ae1dAb06Ac056EE2A0C89aDE0f723022d",
+    "5000": "0x55CbD830841299a398958bC0a43Be2B31B8CF73D",
+    "534352": "0xa839F61b1f6e19ecD0f0aCFE61Bc14B1A49b8FB9"
+  }
+}

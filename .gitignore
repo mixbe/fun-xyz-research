@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+._*
+
+# IDE
+.idea/
+
+# Playwright 会话产物
+.playwright-mcp/
