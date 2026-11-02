@@ -1,7 +1,7 @@
 _# Fun (fun.xyz) 出入金业务流程与接入架构
 
 > 调研日期:2026-11-02
-> 依据:`@funkit/connect-core@13.0.0`(无头编排层)、`@fun-xyz/fiat-contract@0.49.0`(法币流程契约,fun-backend 同源)、`@funkit/api-base@10.0.0`、`@funkit/core@2.3.68` 还原源码;及 Lighter 线上前端的运行时实证。
+> 依据:`@funkit/connect-core@13.0.0`(无头编排层)、`@fun-xyz/fiat-contract@0.49.0`(法币流程契约,fun-backend 同源)、`@funkit/api-base@10.0.0`、`@funkit/core@2.3.68` 还原源码;及 Fun 客户线上前端的运行时实证。
 > 源码位置:`research/fun-sdk-source/`(共 209 个 TS 文件)
 > 姊妹篇:`fun-xyz-调研报告.md`(公司/合规/竞争)、`fun-支付机制源码级研究.md`(机制细节)
 
@@ -11,7 +11,7 @@ _# Fun (fun.xyz) 出入金业务流程与接入架构
 
 ```mermaid
 flowchart TB
-    subgraph 宿主应用["宿主应用(如 Lighter)"]
+    subgraph 宿主应用["宿主应用(Fun 客户)"]
         FE["宿主前端<br/>@funkit/connect 部件 或 connect-core 无头层"]
         BE["宿主后端<br/>(可选,法币流必须)"]
     end
@@ -77,7 +77,7 @@ flowchart TB
 
 > **JWT 验证不是"共用密钥"**:接入时宿主把**公钥**登记给 Fun;运行时宿主用**私钥**签 JWT(私钥永远不出宿主后端),Fun 只用公钥**验签**。公钥只能验真、不能伪造,所以 Fun 冒充不了宿主——与 Apple Sign In / OIDC 的 token 验证同一模式。(源码注释明确验证发生在 Fun 后端;具体登记形式——静态公钥或 JWKS 轮换——在 fun-backend 私有仓库,公开层面不可见。)
 
-> **邮箱登录是条件分支,不是必经步骤**:法币状态机入口处分叉——宿主提供了 JWT → `SESSION_AUTH`(验签通过即继续);宿主未提供 → `FUN_AUTH`(邮箱+验证码,见 §3.1 状态图)。源码注释:"Fun's own email login, for a customer whose host mints no identity assertion"。走宿主 JWT 路径的集成方(如 Lighter)的用户**永远看不到** Fun 的邮箱登录界面。
+> **邮箱登录是条件分支,不是必经步骤**:法币状态机入口处分叉——宿主提供了 JWT → `SESSION_AUTH`(验签通过即继续);宿主未提供 → `FUN_AUTH`(邮箱+验证码,见 §3.1 状态图)。源码注释:"Fun's own email login, for a customer whose host mints no identity assertion"。走宿主 JWT 路径的集成方的用户**永远看不到** Fun 的邮箱登录界面。
 
 **路径一:宿主 JWT(首选)**
 
@@ -152,14 +152,36 @@ sequenceDiagram
 ```
 
 **要点:**
-- **无需登录、无需钱包连接、无需 KYC**——`recipientAddr` 甚至可以是合约地址或纯数字账户号(Lighter 的 account index `"1234"` 在 Fun 类型系统 `FunAddress` 中是合法值)
+- **无需登录、无需钱包连接、无需 KYC**——`recipientAddr` 甚至可以是合约地址或纯数字账户号(account index `"1234"` 这类宿主账户号在 Fun 类型系统 `FunAddress` 中是合法值)
 - 一次性返回全 VM 地址:EVM / Solana / Bitcoin(Segwit+Taproot)/ Tron
-- 首笔入金即可为新用户开户(Lighter 的"入金自动开户"即此)
+- 首笔入金即可为新用户开户("入金自动开户"即此)
 - 可选预报价:`POST /checkout/quoteV2` 展示费用明细(FeeBreakdownV2:gas/fillCost/swapImpact/appFee/minReceived)
 
 ### 2.2 模式 B:客户端执行(需要用户钱包)
 
 报价直接返回**完整可执行的动作序列**,用户钱包逐步签名执行,Fun 只做记账(`CONTRACT_CALL` 类型)。
+
+**逐步拆解:**
+
+```
+① 前端调 POST /checkout/quoteV2,带 routing: true
+② Fun 返回 RoutedQuoteResponse:
+   · provider: 选中的执行供应商(relay | across)
+   · execution.steps[]: 完整有序的链上动作序列,例如
+       第1步 { vm:"EVM", to:USDC合约, data: approve… }        ← 授权
+       第2步 { vm:"EVM", to:跨链桥,   data: deposit…, value:0 } ← 桥入金
+       …(兑换/桥/目标动作全部列好,calldata 就是最终执行内容)
+   · metadata.feeBreakdown + expiresAtMs
+③ 用户连接的钱包(MetaMask 等)逐步弹窗签名、逐笔发链上交易
+   —— 每一步用户都能在钱包里看到,客户端也可先本地校验再签
+④ 全部执行完,前端把最终 txHash 报给 POST /direct-execution
+   类型 = CONTRACT_CALL:Fun 只做记账与状态追踪,不参与路由
+   (源码注明 "No funkit-side routing or relay involvement")
+```
+
+**permit 变体(gasless)**:第 ③ 步不发 approve 交易,改为对 EIP-2612(permit)/EIP-3009(transferWithAuthorization)消息做**离线签名**,交给中继者代提交——用户全程不付 gas。这就是 gasless 入金变体。
+
+一句话:**模式 B 里 Fun 只当"报价引擎 + 记账员",资金的每一步链上移动都从用户自己的钱包发出。**
 
 ```mermaid
 sequenceDiagram
@@ -208,6 +230,27 @@ stateDiagram-v2
 
 > 源侧 `FROM_*` 与目标侧 `TO_*` 分离推进,精确表达跨链两阶段承诺;退款走独立的 `RefundState` 状态机(INITIATED → WAITING_FOR_FULFILLMENT → REFUNDED / PROCEEDED)。
 > 注意:老版 `POST /checkout`(入金即执行预签名 UserOp)将于 **2026-12-21 下线**,由上述两条新路径替代。
+
+### 2.4 两种模式对比与选型
+
+| 维度 | 模式 A:UDA 入金地址 | 模式 B:客户端执行 |
+|---|---|---|
+| **谁执行链上动作** | Fun 后端(检测到账后代为路由执行) | 用户自己的钱包逐笔签名执行 |
+| **用户需要什么** | 什么都不用连——从任何地方转账都行(交易所提币、冷钱包、他人代付) | 浏览器里必须连接钱包 |
+| **资金路径** | 先进 Fun 的入金地址,再由 Fun 路由到目标 | **不经过 Fun 的地址**,用户钱包直达各合约 |
+| **gas 谁付** | Fun(含在报价费用里) | 用户付(permit 变体除外——中继者/paymaster 代付) |
+| **执行节奏** | 异步:转账后等链上检测(通常几分钟,状态机轮询) | 同步:用户签一步走一步,当场确认 |
+| **可验证性** | 黑盒:信任 Fun 兑现(`minReceived` 保底兜住) | 白盒:`execution.steps[]` 即最终 calldata,客户端可本地校验后再签 |
+| **失败处理** | Fun 的退款状态机(INITIATED→REFUNDED…) | 钱包/区块浏览器直接看到失败,用户自行重试 |
+| **Fun 的角色** | 全托管式:检测、路由、清结算、退款 | 仅报价 + 记账(CONTRACT_CALL) |
+| **典型场景** | 纯入金、无钱包用户、交易所直提、移动端扫码 | DApp 内已连钱包、兑换+入金一步完成、对托管敏感的用户 |
+
+**选型:**
+- 产品只有"充值"场景、用户来源杂(交易所/转账/扫码)→ **模式 A**,零门槛转化率最高
+- 用户已在 DApp 里连着钱包、本来就要签名 → **模式 B** 顺理成章,顺路打包"兑换+桥+入金";想再降门槛用 permit 变体(零 gas)
+- **两者不互斥**:同一宿主可同时开启——Funkit 部件走 A,自研 gasless 入金走 B 的 permit 变体
+
+> 一句话:**模式 A 信任换便捷**(资金先进 Fun 地址,换来"从哪都能充");**模式 B 便捷换自主**(资金不出自己钱包,但要连钱包、非 permit 时自己付 gas)。
 
 ---
 
@@ -311,7 +354,7 @@ flowchart TB
 | API key | 随前端分发,视同公开 | 服务端保管,可保密 |
 | 法币身份 | 宿主后端签 JWT(仍需后端) | 代理层注入身份 |
 | 时延/体验 | 最短路径,部件开箱即用 | 多一跳,可控缓存与风控 |
-| 现成案例 | Lighter/Polymarket 前端直连 | Lighter 的 `bridge.lighter.xyz`(白标代理 Fun API,要求第三方仅服务端调用) |
+| 现成案例 | Polymarket 等前端直连 | 宿主可自建白标代理层(代理 Fun API,要求第三方仅服务端调用) |
 
 ### 5.2 SDK 分工
 

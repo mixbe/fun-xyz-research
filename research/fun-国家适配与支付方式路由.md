@@ -2,7 +2,7 @@
 
 > 调研日期:2026-11-02
 > 起因:一次对 `frog.fun.xyz/api/meld/quote` 的实测(HK $500 → VISA via MoonPay)引出的问题:"怎么根据国家来适配支持的卡"。
-> 依据:`@funkit/api-base@10.0.0` 源码(meld/types.ts)、Lighter 线上 bundle 的 Statsig 动态配置(`foppriority`)、frog 网关实测(HK/US/BR/DE/NG 四组报价对比)。
+> 依据:`@funkit/api-base@10.0.0` 源码(meld/types.ts)、Fun 客户线上 bundle 的 Statsig 动态配置(`foppriority`)、frog 网关实测(HK/US/BR/DE/NG 四组报价对比)。
 > 姊妹篇:《fun-功能与接口完整文档》(§5.6 供应商子域)、《fun-出入金业务流程与接入架构》(§3.2 供应商路由)。
 
 ---
@@ -38,7 +38,7 @@ flowchart TB
 
 ### 2.2 UI 优先级层:`foppriority` 国家矩阵(核心)
 
-配置形态:Statsig 动态配置(Lighter bundle 实测提取),`variants` 按**国家条件**返回支付方式有序列表——排序即 UI 展示顺序。完整矩阵:
+配置形态:Statsig 动态配置(宿主线上 bundle 实测提取),`variants` 按**国家条件**返回支付方式有序列表——排序即 UI 展示顺序。完整矩阵:
 
 | 适用国家 | 支付方式优先级(截取前几项) |
 |---|---|
@@ -148,4 +148,4 @@ Meld 按"国家 × 币种 × 金额 × 各家在该国的收单资质"筛选,返
 |---|---|
 | 《fun-功能与接口完整文档》 | §5.1 路由表端点、§5.6 供应商子域、§7.4 供应商与支付方式枚举 |
 | 《fun-出入金业务流程与接入架构》 | §3.2 供应商路由与询价 |
-| 源码 | `api-base/src/services/meld/types.ts`(请求/响应全字段)、`fiat-contract/dist/routing.d.ts`(路由契约)、Lighter bundle 的 `foppriority` Statsig 配置 |
+| 源码 | `api-base/src/services/meld/types.ts`(请求/响应全字段)、`fiat-contract/dist/routing.d.ts`(路由契约)、宿主线上 bundle 的 `foppriority` Statsig 配置 |

@@ -40,7 +40,7 @@ CRYPTO_TO_CRYPTO 加密→加密(跨链)
 | `fromChainId` / `fromTokenAddress` | 源链+源币(地址可用 EVM 或 Solana base58) |
 | `toChainId` / `toTokenAddress` | 目标链+目标币 |
 | `fromAmountBaseUnit` XOR `toAmountBaseUnit` | **二选一**:EXACT_INPUT 或 EXACT_OUTPUT 报价 |
-| `userAddress` / `recipientAddress` | 用户地址 / 收款地址(`FunAddress` 可为 Lighter 账户号) |
+| `userAddress` / `recipientAddress` | 用户地址 / 收款地址(`FunAddress` 可为宿主应用账户号) |
 | `usePermit` | 显式指定源侧授权方式:`true`=permit 签名,`false`=approve 流程,缺省=后端决定 |
 | `routing` | 选择加入 provider-aware 路由,响应变为 `RoutedQuoteResponse` |
 | `actionParams` | 附带的链上动作参数(报价时即把要执行的合约调用算进路径) |
@@ -77,7 +77,7 @@ type CheckoutExecutionStep =
 | `fillCostUsd` / `fillCostPercent` | 路径填充成本 |
 | `swapImpact` / `swapImpactUsd` | 兑换价格冲击 |
 | `maxSlippage` / `minReceived` | 滑点保护与保底到账 |
-| `appFeePercent` / `appFeeUsd` / `appFeeLabel` | **集成方抽成**(Lighter 场景 label 就是 "Fun fee") |
+| `appFeePercent` / `appFeeUsd` / `appFeeLabel` | **集成方抽成**(默认 label 就是 "Fun fee") |
 | `exchangeRate` | 仅兑换时有 |
 
 ### Lightning 报价
@@ -117,7 +117,7 @@ enum CheckoutRefundState {
 }
 ```
 
-配套类型 `FunAddress = EVM | Solana | Bitcoin | Tron | LighterAccountIndex`——**Lighter 账户号(`"1234"` 这种纯数字串)在 Fun 的类型系统里是一种地址**,这就是"一笔入金直达交易账户"的实现基础。
+配套类型 `FunAddress = EVM | Solana | Bitcoin | Tron | LighterAccountIndex`——**宿主应用账户号(`"1234"` 这种纯数字串)在 Fun 的类型系统里是一种地址**,这就是"一笔入金直达交易账户"的实现基础。
 
 ## 5. 执行引擎:`/direct-execution`
 
@@ -133,7 +133,7 @@ enum CheckoutRefundState {
 | `EXTERNALLY_FULFILLED` | 纯追踪:执行与结算完全在 Fun 体系外,后端只落库不轮询 |
 | `TEST_EXECUTION` | 测试专用 |
 
-`DirectExecution` 记录含 `listenerInfo`——执行监听器把三个体系的原始状态都存下来:Relay 执行请求(含费用明细 `fees/feesUsd/appFees`)、LayerZero 端到端路径(`srcEid/dstEid/pathway/compose`)、以及 **Lighter 专属执行状态响应**(L2 交易从 `queued_at → committed_at → verified_at → executed_at` 的全生命周期)。`isDepositDetectionDE` 标记"由链上事件检测合成的临时记录,待真实记录确认后替换"。
+`DirectExecution` 记录含 `listenerInfo`——执行监听器把三个体系的原始状态都存下来:Relay 执行请求(含费用明细 `fees/feesUsd/appFees`)、LayerZero 端到端路径(`srcEid/dstEid/pathway/compose`)、以及 **appchain 专属执行状态响应**(L2 交易从 `queued_at → committed_at → verified_at → executed_at` 的全生命周期)。`isDepositDetectionDE` 标记"由链上事件检测合成的临时记录,待真实记录确认后替换"。
 
 ## 6. 法币通道:Frog 网关 + fops
 
@@ -208,7 +208,7 @@ enum CheckoutRefundState {
 | Tron | 728126428 |
 | HyperCore | 1337 |
 
-Lighter 专属配套:`LIGHTER_SIGNER_CHAIN_ID_BY_INSTANCE = {主网: 304, RH实例: 466324}`(WASM 签名域),API host 映射 `mainnet.zklighter.elliot.ai` / `api.rh.lighter.xyz`。源码把 Lighter 两个实例列为 first-class NON_EVM 链。
+这两条 appchain 有专属配套:`LIGHTER_SIGNER_CHAIN_ID_BY_INSTANCE = {主网: 304, RH实例: 466324}`(WASM 签名域),API host 映射 `mainnet.zklighter.elliot.ai` / `api.rh.lighter.xyz`。源码把这两个实例列为 first-class NON_EVM 链。
 
 ## 9. 风控与合规
 
@@ -283,4 +283,4 @@ GET  /api/exchange-rates / /geo/ip-address  汇率与地理
 | `core/src/auth/` | Auth + SessionKeyAuth |
 | `chains/src/const/` | 全链元数据与链 ID 常量 |
 
-> 注:React 收银台 UI(`@funkit/checkout`)未发布 npm,只能从宿主 bundle(如 Lighter 的 vendor-ui-web3)逆向;但 UI 消费的全部协议层在上述包中是完整的。
+> 注:React 收银台 UI(`@funkit/checkout`)未发布 npm,只能从宿主线上 bundle 逆向;但 UI 消费的全部协议层在上述包中是完整的。
