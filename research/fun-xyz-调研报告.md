@@ -17,7 +17,7 @@
 2. **它的开发者文档门户 `docs.fun.xyz` 是完全登录墙**，所有路径 307 跳转 `/login`。目前**最接近"公开官方文档"的其实是一个 Intercom 帮助中心**和**从公开 npm 包里逆向出来的接口契约**。
 3. **它的合规姿态是"我不是 money service"**。Terms of Use 明确写明三种 Fulfillment Method，其中一种让 Fun 以**principal（自营交易对手）**身份直接买入用户代币——这是规避资金传输牌照（money transmission）的一种结构性设计，而非叙事包装。
 
-对当前工作目录 `app-lighter` 的直接相关性：**Lighter 是 Fun 的公开客户**，且 `@funkit/connect` SDK 里存在 `clients/lighter.tsx` 与 `clients/lighterRh.tsx` 两套白标主题，另有 `LIGHTER_CHAIN_ID = 3586256` / `LIGHTER_RH_CHAIN_ID = 548123634` 两条链常量。
+对当前工作目录 `fun-xyz-research` 的直接相关性：**Lighter 是 Fun 的公开客户**，且 `@funkit/connect` SDK 里存在 `clients/lighter.tsx` 与 `clients/lighterRh.tsx` 两套白标主题，另有 `LIGHTER_CHAIN_ID = 3586256` / `LIGHTER_RH_CHAIN_ID = 548123634` 两条链常量。
 
 ---
 
@@ -417,7 +417,7 @@ export declare const POLYMARKET_API_KEY = "Y53d...t1k6";
 
 ---
 
-## 9. 对 `app-lighter`（Lighter）的相关性
+## 9. 对 `fun-xyz-research`（Lighter 案例）的相关性
 
 若当前项目与 Lighter 相关，以下事实直接可用：
 
@@ -551,7 +551,7 @@ export declare const POLYMARKET_API_KEY = "Y53d...t1k6";
 | 可自建 | ✅ `fiat-contract` 的状态机以数据形式完全公开，据此可自行实现客户端或写一致性测试 |
 | 可直接用 | ⚠️ `@funkit/connect` 需向 Fun 申请自己的 API key（包里硬编码的 48 把是各客户自己的，见 §8.4） |
 
-**对 app-lighter 的直接价值**：Lighter 的 appchain 接入参数**全部可从公开 npm 包直接读出**，无需 Fun 的开发者权限——包括 `LIGHTER_CHAIN_ID = 3586256`、`LIGHTER_RH_CHAIN_ID = 548123634`、`clients/lighter.tsx` 与 `clients/lighterRh.tsx` 的主题配置、以及各链的 `VAULT_DEPOSITOR` 合约地址（`0xC8A6871D4eC4DaE64F605db0f8a0B3D9ef928D64` 等）。
+**对 fun-xyz-research（Lighter 案例）的直接价值**：Lighter 的 appchain 接入参数**全部可从公开 npm 包直接读出**，无需 Fun 的开发者权限——包括 `LIGHTER_CHAIN_ID = 3586256`、`LIGHTER_RH_CHAIN_ID = 548123634`、`clients/lighter.tsx` 与 `clients/lighterRh.tsx` 的主题配置、以及各链的 `VAULT_DEPOSITOR` 合约地址（`0xC8A6871D4eC4DaE64F605db0f8a0B3D9ef928D64` 等）。
 
 ---
 
