@@ -1,3 +1,5 @@
+// NOTE: key values redacted for publication (first/last 4 chars kept).
+// Originals ship in the public npm package @funkit/api-base.
 export const AAVE_API_KEY = 'EWzS...5ztS'
 export const AVANTIS_API_KEY = '6TUi...oeW2'
 export const AXIOM_API_KEY = 'y7lY...BIXO'

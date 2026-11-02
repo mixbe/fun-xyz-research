@@ -404,6 +404,8 @@ export declare const AAVE_API_KEY = "EWzS...5ztS";
 export declare const POLYMARKET_API_KEY = "Y53d...t1k6";
 ```
 
+> 注：本仓库内所有 key 值均已脱敏（仅保留首尾 4 位）；完整值见公开 npm 包 `@funkit/api-base` 的 `dist/src/consts/customers.d.ts`。
+
 涉及的客户标识（按类别整理，标识符为原文）：
 
 - **预测市场 / 博彩**：POLYMARKET、POLYMTRADE、PREDICT、OPINION、FLIP、FLIPGG、RAREBETSPORTS、MONKEY_TILT、VARIATIONAL、BETMOAR、EITGHTYEIGHTUPS
